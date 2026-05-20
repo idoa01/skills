@@ -1,0 +1,7 @@
+{
+  "name": "py-tdd",
+  "description": "Test-driven development with red-green-refactor loop in Python. Guides you through vertical TDD slices using pytest.",
+  "author": {
+    "name": "Ido Abramovich"
+  }
+}

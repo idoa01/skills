@@ -1,0 +1,19 @@
+{
+  "name": "my-skills",
+  "owner": {
+    "name": "Ido Abramovich"
+  },
+  "description": "A collection of Claude Code skills for my personal use",
+  "plugins": [
+    {
+      "name": "py-tdd",
+      "source": "./plugins/py-tdd",
+      "description": "Test-driven development with red-green-refactor loop in Python. Guides you through vertical TDD slices using pytest.",
+      "author": {
+        "name": "Ido Abramovich"
+      },
+      "category": "testing",
+      "tags": ["python", "tdd", "pytest", "testing"]
+    }
+  ]
+}
