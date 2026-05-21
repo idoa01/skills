@@ -1,0 +1,7 @@
+{
+  "name": "setup-idoa01-skills",
+  "description": "inject skill information into claude.md",
+  "author": {
+    "name": "Ido Abramovich"
+  }
+}
