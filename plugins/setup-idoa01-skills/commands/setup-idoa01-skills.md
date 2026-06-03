@@ -125,9 +125,10 @@ Issues live in Beads; use the `bd` CLI. See `.claude/docs/agents/issue-tracker.m
 3. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
 4. **PRD-level issues are epics**: Every PRD-level issue must be created as an epic. Sub-issues must reference their parent epic.
 5. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
+6. **One issue per session**: Pick up exactly one issue per session. Once closed, stop — report what was done and any non-obvious decisions or complications, then go silent. See `.claude/docs/agents/issue-tracker.md` for the full stop-and-report format.
 ```
 
-Then write the three docs files using the seed templates in this skill folder as a starting point:
+Then write the three docs files by copying the seed templates in this skill folder verbatim — do not paraphrase, summarise, or simplify them. The only permitted edits are repo-specific substitutions (e.g. replacing placeholder paths or label names with values the user confirmed):
 
 - [issue-tracker-github.md](../docs/issue-tracker-github.md) — GitHub issue tracker
 - [issue-tracker-gitlab.md](../docs/issue-tracker-gitlab.md) — GitLab issue tracker
