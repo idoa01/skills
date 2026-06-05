@@ -7,11 +7,12 @@ Run `bd prime` to understand important commands and workflows for AI agents.
 ## Mandatory rules — apply in every session, regardless of which skill is running
 
 1. **Session start**: Run `bd prime` before doing any issue tracker work. Do not skip this even if the session feels like a continuation.
-2. **Before working on an issue**: Claim it in the tracker before writing any code or making any changes.
-3. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
-4. **PRD-level issues are epics**: Every PRD-level issue must be created as an epic. Sub-issues must reference their parent epic.
-5. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
-6. **One issue per session**: When working from the issue tracker, pick up exactly one issue per session. Once that issue is closed, stop. Write a closing report of 5–10 sentences summarising what was done. For each non-obvious decision, complication, or anything not explicitly derived from the issue description, add 2–3 sentences explaining what it was, why it arose, and how you resolved it. Then go silent — do not pick up another issue, suggest next steps, or continue with related work unless the user gives a new instruction.
+2. **Read the PRD before claiming**: If the issue has a parent epic, run `bd show <parent-id> --json` to read the PRD. Use it as background context only — understand the broader goal, but do not act on work described there that falls outside the specific issue you are about to claim.
+3. **Before working on an issue**: Claim it in the tracker before writing any code or making any changes.
+4. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
+5. **PRD-level issues are epics**: Every PRD-level issue must be created as an epic. Sub-issues must reference their parent epic.
+6. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
+7. **One issue per session**: When working from the issue tracker, pick up exactly one issue per session. Once that issue is closed, stop. Write a closing report of 5–10 sentences summarising what was done. For each non-obvious decision, complication, or anything not explicitly derived from the issue description, add 2–3 sentences explaining what it was, why it arose, and how you resolved it. Then go silent — do not pick up another issue, suggest next steps, or continue with related work unless the user gives a new instruction.
 
 ## Conventions
 

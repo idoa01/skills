@@ -121,11 +121,12 @@ Issues live in Beads; use the `bd` CLI. See `.claude/docs/agents/issue-tracker.m
 **Mandatory rules — apply in every session, regardless of which skill is running:**
 
 1. **Session start**: Run `bd prime` before doing any issue tracker work. Do not skip this even if the session feels like a continuation.
-2. **Before working on an issue**: Claim it in the tracker before writing any code or making any changes.
-3. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
-4. **PRD-level issues are epics**: Every PRD-level issue must be created as an epic. Sub-issues must reference their parent epic.
-5. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
-6. **One issue per session**: Pick up exactly one issue per session. Once closed, stop — report what was done and any non-obvious decisions or complications, then go silent. See `.claude/docs/agents/issue-tracker.md` for the full stop-and-report format.
+2. **Read the PRD before claiming**: If the issue has a parent epic, run `bd show <parent-id> --json` to read the PRD. Use it as background context only — understand the broader goal, but do not act on work described there that falls outside the specific issue you are about to claim.
+3. **Before working on an issue**: Claim it in the tracker before writing any code or making any changes.
+4. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
+5. **PRD-level issues are epics**: Every PRD-level issue must be created as an epic. Sub-issues must reference their parent epic.
+6. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
+7. **One issue per session**: Pick up exactly one issue per session. Once closed, stop — report what was done and any non-obvious decisions or complications, then go silent. See `.claude/docs/agents/issue-tracker.md` for the full stop-and-report format.
 ```
 
 Then write the three docs files by copying the seed templates in this skill folder verbatim — do not paraphrase, summarise, or simplify them. The only permitted edits are repo-specific substitutions (e.g. replacing placeholder paths or label names with values the user confirmed):
