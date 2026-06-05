@@ -166,6 +166,14 @@ Prioritize findings in this order:
 Do not flood the review with low-value nits if there are larger structural issues.
 Prefer a smaller number of high-conviction comments over a long list of cosmetic notes.
 
+### HTML report
+
+When the user wants the review as a standalone visual artifact (an "HTML report", "a nice
+page", "something I can open in the browser"), render it per [HTML-REPORT.md](./HTML-REPORT.md).
+That document is the single source of truth for the format: the copy-verbatim scaffold,
+the severity-first finding cards, the conditional Mermaid/strengths sections, and where to
+write and open the file.
+
 ## Approval Bar
 
 Do not approve merely because behavior seems correct.
