@@ -116,6 +116,40 @@ After all tests pass, look for [refactor candidates](../docs/refactoring.md):
 
 **Never refactor while RED.** Get to GREEN first.
 
+## Adding tests to existing code (test-after)
+
+Sometimes the code already exists and works — you skipped TDD, or you're backfilling tests
+flagged by [`/audit-tests`](audit-tests.md). The standard loop assumes the test fails first,
+but here the behavior is already implemented, so a correct test **passes the moment you
+write it**. That removes the RED step — and RED is what proves the test can actually fail.
+A test you never saw fail might be passing for the wrong reason (vacuous assertion,
+tautology, asserting nothing). That's the same weak-test trap TDD exists to avoid.
+
+First, split the work by *why* the behavior is untested:
+
+- **Missing or broken behavior** — the code doesn't do it yet, or does it wrong. This is a
+  genuine RED. Use the normal red→green loop above; do **not** use the test-after recipe.
+- **Already-working behavior, just untested** — the code is correct, only the test is
+  missing. Use the test-after recipe below.
+
+**Test-after recipe — recover RED by breaking the code on purpose.** For each behavior, one
+at a time:
+
+```
+1. Write ONE behavior test through the public interface.
+2. Run it — it passes (expected; the code already works).
+3. CONFIRM IT CAN FAIL: temporarily break the implementation it covers
+   (comment out the `raise`, flip a condition, return a wrong value).
+4. Run it — it must now FAIL, and fail for the reason you expect.
+   - Still passes? The test is vacuous. Strengthen the assertion and repeat from 3.
+5. Revert the break. Run it — green again.
+6. Move to the next behavior.
+```
+
+Step 3–4 is the whole point: it's poor-man's mutation testing, and it's what makes a
+test-after test trustworthy. Never skip it. Same rules as the normal loop otherwise — one
+behavior at a time, public interface only, no bulk test-writing.
+
 ## Reference files (load as needed)
 
 - **Tests** — good vs bad test examples → [docs/tests.md](../docs/tests.md)
