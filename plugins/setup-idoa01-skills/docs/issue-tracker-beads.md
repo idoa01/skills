@@ -22,7 +22,8 @@ Run `bd prime` to understand important commands and workflows for AI agents.
   - Use `--type epic` when creating the PRD level issue
 - Issues:
   - issues under the PRD level should be created with `--type bug|feature|task|epic|chore|decision`, the default should be `--type task`
-  - issues under the PRD should be created with `--parent <epic-id>` with the id of the parent epic
+  - issues under the PRD **must** be created with `--parent <epic-id>` at creation time — this gives the child a hierarchical ID like `wk8.1`, `wk8.2`. A post-hoc `bd dep add --type=parent-child` only adds a graph edge; it does NOT rename the issue, and Beads IDs cannot be changed after creation. If you forget `--parent`, delete the issue and recreate it.
+  - avoid chaining multiple `bd create` calls in a single Bash command — they can race on the DB and silently drop issues. Run each `bd create` as a separate command.
   - give each issue a relevant priority with `-p <level>` with levels 0-4 or P0-P4, 0=highest) (default "2")
   - set issue dependencies with `--deps`. Dependencies in format 'type:id' or 'id' (e.g., 'discovered-from:bd-20,blocks:bd-15' or 'bd-20')
 - When you need to understand what to do now, use `bd ready`

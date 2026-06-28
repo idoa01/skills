@@ -4,7 +4,7 @@ description: Sets up an `## Agent skills` block in AGENTS.md/CLAUDE.md/CLAUDE.lo
 disable-model-invocation: true
 ---
 
-# Setup Matt Pocock's Skills
+# Setup idoa01 Skills
 
 Scaffold the per-repo configuration that the engineering skills assume:
 

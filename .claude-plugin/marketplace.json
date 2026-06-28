@@ -1,5 +1,5 @@
 {
-  "name": "my-skills",
+  "name": "idoa01-skills",
   "owner": {
     "name": "Ido Abramovich"
   },
@@ -24,6 +24,16 @@
       },
       "category": "setup",
       "tags": ["setup", "skills"]
+    },
+    {
+      "name": "adversarial-review",
+      "source": "./plugins/adversarial-review",
+      "description": "Cross-model adversarial plan review loop using Cursor Agent. Use after /grill-with-docs to stress-test a plan before committing to implementation. Ends by updating CONTEXT.md and calling /to-prd and /to-issues.",
+      "author": {
+        "name": "Ido Abramovich"
+      },
+      "category": "planning",
+      "tags": ["planning", "review", "adversarial", "cursor"]
     },
     {
       "name": "thermo-nuclear-code-quality-review",
