@@ -36,6 +36,16 @@
       "tags": ["planning", "review", "adversarial", "cursor"]
     },
     {
+      "name": "git-public-commit",
+      "source": "./plugins/git-public-commit",
+      "description": "Create git commit messages for this repo using plain Conventional Commits format (type(scope): description) — no JIRA ticket lookup, no server-hook regex validation. Use whenever the user wants to commit staged or unstaged work in this repo, asks to \"commit this\", \"make a commit\", \"stage and commit\", write a commit message, or split changes into commits.",
+      "author": {
+        "name": "Ido Abramovich"
+      },
+      "category": "git",
+      "tags": ["git", "commit", "conventional-commits"]
+    },
+    {
       "name": "thermo-nuclear-code-quality-review",
       "source": "./plugins/thermo-nuclear-code-quality-review",
       "description": "Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth. Use for a thermo-nuclear code quality review, thermonuclear review, deep code quality audit, or especially harsh maintainability review.",
