@@ -1,6 +1,6 @@
 ---
 name: thermo-nuclear-code-quality-review
-description: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth. Use for a thermo-nuclear code quality review, thermonuclear review, deep code quality audit, or especially harsh maintainability review.
+description: Run an extremely strict maintainability review for abstraction quality, giant files, and spaghetti-condition growth. Use for a thermo-nuclear code quality review, thermonuclear review, deep code quality audit, or especially harsh maintainability review. Can render the review as a standalone HTML report, or — on explicit request — post it as an inline-comment review directly on a GitHub PR.
 disable-model-invocation: true
 ---
 
@@ -168,11 +168,31 @@ Prefer a smaller number of high-conviction comments over a long list of cosmetic
 
 ### HTML report
 
-When the user wants the review as a standalone visual artifact (an "HTML report", "a nice
-page", "something I can open in the browser"), render it per [HTML-REPORT.md](./HTML-REPORT.md).
-That document is the single source of truth for the format: the copy-verbatim scaffold,
-the severity-first finding cards, the conditional Mermaid/strengths sections, and where to
-write and open the file.
+Default to this format when the user doesn't specify an output. When the user wants the
+review as a standalone visual artifact (an "HTML report", "a nice page", "something I can
+open in the browser"), render it per [HTML-REPORT.md](./HTML-REPORT.md). That document is
+the single source of truth for the format: the copy-verbatim scaffold, the severity-first
+finding cards, the conditional Mermaid/strengths sections, and where to write and open the
+file.
+
+### GitHub inline comments
+
+When the user explicitly asks to post the review onto GitHub itself — "post this to the
+PR", "comment on github", "add inline comments", "leave review comments on the PR", "post
+this as a github review" — post it as a real PR review via `gh api` instead of (or in
+addition to) the HTML report. Follow [GITHUB-COMMENTS.md](./GITHUB-COMMENTS.md), which is
+the single source of truth for that mode: resolving the target PR, parsing the diff to
+find valid comment anchors, skipping findings already flagged in earlier reviews, walking
+the user through approval one finding at a time before posting anything, and the exact
+`gh api` payload.
+
+This request can also come *after* an HTML report was already generated in the same
+conversation ("now post those to the PR") — in that case, reuse the findings already
+produced rather than re-reviewing the diff from scratch, per GITHUB-COMMENTS.md §7.
+
+Do not default into this mode. Posting comments is visible to the whole team and not
+casually reversible, so only do it on explicit request, and never post anything without
+the user's approval of the exact final set of comments.
 
 ## Approval Bar
 
