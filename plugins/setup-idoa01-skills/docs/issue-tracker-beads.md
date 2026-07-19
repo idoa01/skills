@@ -26,6 +26,13 @@ Run `bd prime` to understand important commands and workflows for AI agents.
   - avoid chaining multiple `bd create` calls in a single Bash command — they can race on the DB and silently drop issues. Run each `bd create` as a separate command.
   - give each issue a relevant priority with `-p <level>` with levels 0-4 or P0-P4, 0=highest) (default "2")
   - set issue dependencies with `--deps`. Dependencies in format 'type:id' or 'id' (e.g., 'discovered-from:bd-20,blocks:bd-15' or 'bd-20')
+- **Dependency direction is easy to get backwards — two commands read oppositely:**
+  - `bd dep add <A> <B>` (equivalently `bd link <A> <B>`) means **A depends on B** — B is the blocker, A is blocked. The first positional is the blocked issue.
+  - `bd dep <A> --blocks <B>` means **A blocks B** — the opposite: here the first positional is the blocker.
+  - Prefer `bd dep add <blocked-id> <blocker-id>` consistently and avoid the `--blocks` shorthand unless you double-check the printed confirmation line (`✓ Added dependency: X depends on Y` / `✓ Added dependency: X blocks Y`) after every call.
+- Labels: `bd create` only accepts `-l`/`--labels` (comma-separated) — there is no `--add-label` flag on `create`. `--add-label`/`--remove-label` exist only on `bd update` and `bd label add`, for issues that already exist.
+- `bd create`'s positional argument is the issue **title**, not an id — don't pass an existing issue id as the positional expecting it to target that issue.
+- `bd create` has no `--status` flag — an issue is always created `open` (or `blocked` implicitly, via `--parent`/`--deps` if a blocker is unresolved). To set status on an existing issue, use `bd update <id> --status <status>`.
 - When you need to understand what to do now, use `bd ready`
 
 ## When a skill says "publish to the issue tracker"
@@ -48,15 +55,15 @@ Beads is an AI-agent-first issue tracker so, by default, new issues are ready to
 | `ready-for-human`          | Open                 | `human`                   | Requires human implementation            |
 | `wontfix`                  | Closed               | `wont-fix`                | Will not be actioned                     |
 
-Example: Add an issue that needs triaging: `bd create <id> --status blocked --add-label human,needs-triage`
+Example: Create an issue that needs triaging: `bd create "<title>" --labels human,needs-triage` then `bd update <new-id> --status blocked` (status can't be set at creation time — see the `bd create` caveats above).
 
 ## Wayfinding operations
 
 Used by `/wayfinder`. The **map** is an epic with **child** issues as tickets — the same epic/parent-child hierarchy already used for specs above, not a separate label convention.
 
-- **Map**: `bd create <title> --type epic --add-label wayfinder:map --description "..."`, body holding the Notes / Decisions-so-far / Fog. The label disambiguates a wayfinder map from an ordinary spec epic, which also uses `--type epic`.
-- **Child ticket**: `bd create <title> --parent <epic-id> --type task --add-label wayfinder:<type>` where `<type>` is one of `research`/`prototype`/`grilling`/`task`. Must be created with `--parent` at creation time (see the parent-child rule above); a post-hoc `bd dep add --type=parent-child` only adds a graph edge and does not rename the issue.
-- **Blocking**: Beads' **native** `blocks` dependency — `bd dep add <blocked-id> <blocker-id>` (or `bd link <blocked-id> <blocker-id>`). This is the canonical representation: `bd ready --explain` and `bd dep tree` render it directly, so no body-convention fallback is needed. A ticket is unblocked when every issue blocking it is closed.
+- **Map**: `bd create <title> --type epic --labels wayfinder:map --description "..."`, body holding the Notes / Decisions-so-far / Fog. The label disambiguates a wayfinder map from an ordinary spec epic, which also uses `--type epic`.
+- **Child ticket**: `bd create <title> --parent <epic-id> --type task --labels wayfinder:<type>` where `<type>` is one of `research`/`prototype`/`grilling`/`task`. Must be created with `--parent` at creation time (see the parent-child rule above); a post-hoc `bd dep add --type=parent-child` only adds a graph edge and does not rename the issue.
+- **Blocking**: Beads' **native** `blocks` dependency — `bd dep add <blocked-id> <blocker-id>` (or `bd link <blocked-id> <blocker-id>`) — see the dependency-direction warning above; verify the confirmation line reads "X depends on Y", not "X blocks Y". This is the canonical representation: `bd ready --explain` and `bd dep tree` render it directly, so no body-convention fallback is needed. A ticket is unblocked when every issue blocking it is closed.
 - **Frontier query**: `bd children <epic-id> --json`, filtered to `status: open` with no unclosed blocker and no assignee — equivalently, `bd ready --json` scoped to children of the map (children inherit the parent-child edge, so an unblocked, unassigned child surfaces there directly). First in map order wins.
 - **Claim**: `bd update <id> --claim` (or `bd assign <id> <you>`) — the session's first write.
 - **Resolve**: `bd comment <id> "<answer>"`, then `bd close <id>`, then append a context pointer (gist + link) to the map's Decisions-so-far in the epic's description (`bd update <epic-id> --append-notes "..."` or re-editing the description).
