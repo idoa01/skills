@@ -1,6 +1,6 @@
 ---
 name: setup-idoa01-skills
-description: Sets up an `## Agent skills` block in AGENTS.md/CLAUDE.md/CLAUDE.local.md and `.claude/docs/agents/` so the engineering skills know this repo's issue tracker (Beads, GitHub, GitLab, or local markdown), triage label vocabulary, and domain doc layout. Run before first use of `to-tickets`, `to-spec`, `triage`, `diagnosing-bugs`, `tdd`, `improve-codebase-architecture`, `domain-modeling`, or `wayfinder` — or if those skills appear to be missing context about the issue tracker, triage labels, or domain docs.
+description: "Configure this repo for the engineering skills: set up its issue tracker (Beads, GitHub, GitLab, or local markdown), triage label vocabulary, and domain doc layout. Run once before first use of the other engineering skills, or when they seem to lack tracker, label, or domain-doc context."
 disable-model-invocation: true
 ---
 
@@ -8,9 +8,9 @@ disable-model-invocation: true
 
 Scaffold the per-repo configuration that the engineering skills assume:
 
-- **Issue tracker** — where issues live (beads by default; local markdown and github is also supported out of the box)
-- **Triage labels** — the strings used for the five canonical triage roles
-- **Domain docs** — where `CONTEXT.md` and ADRs live, and the consumer rules for reading them
+- **Issue tracker**: where issues live (beads by default; local markdown, GitHub and GitLab are also supported out of the box)
+- **Triage labels**: the strings used for the five canonical triage roles
+- **Domain docs**: where `GLOSSARY.md` and ADRs live, and the consumer rules for reading them
 
 This is a prompt-driven skill, not a deterministic script. Explore, present what you found, confirm with the user, then write.
 
@@ -20,53 +20,51 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
 
-- `git remote -v` and `.git/config` — is this a GitHub repo? Which one?
-- `AGENTS.md`, `CLAUDE.md`, `CLAUDE.local.md` at the repo root — does any of those exist? Is there already an `## Agent skills` section in one of them?
-- `CONTEXT.md` and `CONTEXT-MAP.md` at the repo root
+- `git remote -v` and `.git/config`: is this a GitHub or GitLab repo? Which one?
+- `AGENTS.md`, `CLAUDE.md`, `CLAUDE.local.md` at the repo root: does any of those exist? Is there already an `## Agent skills` section in one of them?
+- `GLOSSARY.md` and `GLOSSARY-MAP.md` at the repo root. If the old `CONTEXT.md` / `CONTEXT-MAP.md` exist instead, offer to `git mv` them to the new names; never rename silently.
 - `docs/adr/` and any `src/*/docs/adr/` directories
-- `.claude/docs/agents/` — does this skill's prior output already exist?
-- `.claude/scratch/` — sign that a local-markdown issue tracker convention is already in use
-- `.beads/` - sign that the beads issue tracker is installed in the repo.
+- `.claude/docs/agents/`: does this skill's prior output already exist?
+- `.claude/scratch/`: a sign that a local-markdown issue tracker convention is already in use
+- `.beads/`: a sign that the beads issue tracker is installed in the repo.
 - Is the `triage` skill installed? (a `triage` skill folder alongside this one, or `triage` in your available skills.) This decides whether Section B runs at all.
+- Monorepo signals: a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, or a populated `packages/*` with its own `src/`. These are present only in a genuinely large multi-package repo; their absence means single-context, which is almost every repo.
 
 ### 2. Present findings and ask
 
-Summarise what's present and what's missing. Then walk the user through the decisions **one at a time** — present a section, get the user's answer, then move to the next. Don't dump them all at once.
+Summarise what's present and what's missing. Then take the sections in order. One section, one answer, then the next.
 
-Assume the user does not know what these terms mean. Each section starts with a short explainer (what it is, why these skills need it, what changes if they pick differently). Then show the choices and the default.
+Lead each section with the recommended answer so the user can accept it in a word. Give a one-line explainer only when the choice genuinely branches; skip the section entirely when exploration already settled it (Section B when `triage` isn't installed, Section C when there's no monorepo).
 
-**Section A — Issue tracker.**
+**Section A: Issue tracker.**
 
-> Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, `to-spec`, and `wayfinder` read from and write to it — they need to know whether to create a beads epic/task, call `gh issue create`, write a markdown file under `.scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
+> Explainer: The "issue tracker" is where issues live for this repo. Skills like `to-tickets`, `triage`, `to-spec`, and `wayfinder` read from and write to it. They need to know whether to create a beads epic/task, call `gh issue create`, write a markdown file under `.claude/scratch/`, or follow some other workflow you describe. Pick the place you actually track work for this repo.
 
-Default posture: propose Beads by default, even if you find that this project lives inside git. Otherwise (or if the user prefers), offer:
+Default posture: propose Beads, even if this project lives inside git. Otherwise (or if the user prefers), offer:
 
-- **Beads** - issues live in the local beads instance (uses the `bd` CLI)
-- **GitHub** — issues live in the repo's GitHub Issues (uses the `gh` CLI)
-- **GitLab** — issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
-- **Local markdown** — issues live as files under `.claude/scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
-- **Other** (Jira, Linear, etc.) — ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
+- **Beads**: issues live in the local beads instance (uses the `bd` CLI)
+- **GitHub**: issues live in the repo's GitHub Issues (uses the `gh` CLI)
+- **GitLab**: issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
+- **Local markdown**: issues live as files under `.claude/scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
+- **Other** (Jira, Linear, etc.): ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
 
-If the user selected Beads and you didn't find a `.beads/` directory inside the repo root, suggest installing beads for the user using `bd init ---non-interactive --quiet` - ask the user whether to add `--stealth` to configure the beads repository as invisible to other team members.
+If the user selected Beads and you didn't find a `.beads/` directory inside the repo root, suggest installing beads for the user using `bd init --non-interactive --quiet`. Ask the user whether to add `--stealth` to configure the beads repository as invisible to other team members.
 
-Record the choice in `.claude/docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off** — leave it off and don't raise it; a user who wants external PRs in the triage queue can flip the flag in the file later.
+Record the choice in `.claude/docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.
 
-**Section B — Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you) — an uninstalled skill needs no labels.
+**Section B: Triage label vocabulary.** Skip this section entirely if the `triage` skill isn't installed (exploration told you), since an uninstalled skill needs no labels.
 
 If it is installed, ask exactly one question:
 
 > Do you want to keep the default triage labels? (recommended: **yes**)
 
-The defaults are the five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. On **yes**, write them as-is. Only if the user says no — usually because their tracker already uses other names (e.g. `bug:triage` for `needs-triage`) — collect the overrides so `triage` applies existing labels instead of creating duplicates.
+The defaults are the five canonical roles, each label string equal to its name: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. On **yes**, write them as-is. Only if the user says no, usually because their tracker already uses other names (e.g. `bug:triage` for `needs-triage`), collect the overrides so `triage` applies existing labels instead of creating duplicates.
 
-**Section C — Domain docs.**
+**Section C: Domain docs.** Default to **single-context** (one `GLOSSARY.md` + `docs/adr/` at the repo root). This fits almost every repo; write it without asking.
 
-> Explainer: Some skills (`improve-codebase-architecture`, `diagnosing-bugs`, `py-tdd`) read a `CONTEXT.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. They need to know whether the repo has one global context or multiple (e.g. a monorepo with separate frontend/backend contexts) so they look in the right place.
+Offer **multi-context** (a root `GLOSSARY-MAP.md` pointing to per-context `GLOSSARY.md` files) only when exploration found monorepo signals. Then confirm which layout they want.
 
-Confirm the layout:
-
-- **Single-context** — one `CONTEXT.md` + `docs/adr/` at the repo root. Most repos are this.
-- **Multi-context** — `CONTEXT-MAP.md` at the root pointing to per-context `CONTEXT.md` files (typically a monorepo).
+> Explainer: Some skills (`improve-codebase-architecture`, `diagnosing-bugs`, `py-tdd`) read a `GLOSSARY.md` file to learn the project's domain language, and `docs/adr/` for past architectural decisions. A monorepo with separate frontend/backend contexts needs one glossary per context so they look in the right place.
 
 ### 3. Confirm and edit
 
@@ -84,9 +82,9 @@ Let them edit before writing.
 - If `CLAUDE.local.md` exists, edit it.
 - Else if `CLAUDE.md` exists, edit it.
 - Else if `AGENTS.md` exists, edit it.
-- If none exists, ask the user which one to create — don't pick for them.
-- If more than one exists, ask the user which one to edit - don't pick for them.
-- If `AGENTS.md` or `CLAUDE.md` exists but `CLAUDE.local.md` doesn't - ask the user if they want to use the existing file or `CLAUDE.local.md`
+- If none exists, ask the user which one to create. Don't pick for them.
+- If more than one exists, ask the user which one to edit. Don't pick for them.
+- If `AGENTS.md` or `CLAUDE.md` exists but `CLAUDE.local.md` doesn't, ask the user if they want to use the existing file or `CLAUDE.local.md`.
 
 If an `## Agent skills` block already exists in the chosen file, update its contents in-place rather than appending a duplicate. Don't overwrite user edits to the surrounding sections.
 
@@ -105,7 +103,7 @@ The block:
 
 ### Domain docs
 
-[one-line summary of layout — "single-context" or "multi-context"]. See `.claude/docs/agents/domain.md`.
+[one-line summary of layout: "single-context" or "multi-context"]. See `.claude/docs/agents/domain.md`.
 ```
 
 Include the `### Triage labels` sub-block, and write `.claude/docs/agents/triage-labels.md`, only when `triage` is installed and Section B ran. When it isn't, both are omitted.
@@ -117,28 +115,30 @@ If the issue tracker is **Beads**, expand the `### Issue tracker` section to inc
 
 Issues live in Beads; use the `bd` CLI. See `.claude/docs/agents/issue-tracker.md`.
 
-**Mandatory rules — apply in every session, regardless of which skill is running:**
+**Mandatory rules, apply in every session, regardless of which skill is running:**
 
 1. **Session start**: Run `bd prime` before doing any issue tracker work. Do not skip this even if the session feels like a continuation.
-2. **Read the spec before claiming**: If the issue has a parent epic, run `bd show <parent-id> --json` to read the spec (you may know this as a PRD). Use it as background context only — understand the broader goal, but do not act on work described there that falls outside the specific issue you are about to claim.
+2. **Read the spec before claiming**: If the issue has a parent epic, run `bd show <parent-id> --json` to read the spec (you may know this as a PRD). Use it as background context only: understand the broader goal, but do not act on work described there that falls outside the specific issue you are about to claim.
 3. **Before working on an issue**: Claim it in the tracker before writing any code or making any changes.
 4. **After completing an issue**: Close it in the tracker immediately. Do not batch closures to the end of a session.
 5. **Spec-level issues are epics**: Every spec-level issue must be created as an epic. Sub-issues must reference their parent epic.
 6. **Closing an epic**: Close the parent epic only after every issue under it is closed. Before closing, verify that no child issue is in any non-closed state (ready, in-progress, blocked, or otherwise open). If the state of any child is unclear, display the current child issue states and ask the user for directions before proceeding.
-7. **One issue per session**: Pick up exactly one issue per session. Once closed, stop — report what was done and any non-obvious decisions or complications, then go silent. See `.claude/docs/agents/issue-tracker.md` for the full stop-and-report format.
+7. **One issue per session**: Pick up exactly one issue per session. Once closed, stop: report what was done and any non-obvious decisions or complications, then go silent. See `.claude/docs/agents/issue-tracker.md` for the full stop-and-report format.
 ```
 
-Then write the docs files by copying the seed templates in this skill folder verbatim — do not paraphrase, summarise, or simplify them. The only permitted edits are repo-specific substitutions (e.g. replacing placeholder paths or label names with values the user confirmed):
+When Section B ran on GitHub or GitLab, create each configured label the tracker lacks (`gh label create` / `glab label create`). Beads and local markdown need no such step: labels come into existence when first applied.
 
-- [issue-tracker-github.md](../docs/issue-tracker-github.md) — GitHub issue tracker
-- [issue-tracker-gitlab.md](../docs/issue-tracker-gitlab.md) — GitLab issue tracker
-- [issue-tracker-local.md](../docs/issue-tracker-local.md) — local-markdown issue tracker
-- [issue-tracker-beads.md](../docs/issue-tracker-beads.md) — Beads issue tracker
-- [triage-labels.md](../docs/triage-labels.md) — label mapping (only if `triage` is installed)
-- [domain.md](../docs/domain.md) — domain doc consumer rules + layout
+Then write the docs files by copying the seed templates in this skill folder verbatim. Do not paraphrase, summarise, or simplify them. The only permitted edits are repo-specific substitutions (e.g. replacing placeholder paths or label names with values the user confirmed):
+
+- [issue-tracker-github.md](../docs/issue-tracker-github.md): GitHub issue tracker
+- [issue-tracker-gitlab.md](../docs/issue-tracker-gitlab.md): GitLab issue tracker
+- [issue-tracker-local.md](../docs/issue-tracker-local.md): local-markdown issue tracker
+- [issue-tracker-beads.md](../docs/issue-tracker-beads.md): Beads issue tracker
+- [triage-labels.md](../docs/triage-labels.md): label mapping (only if `triage` is installed)
+- [domain.md](../docs/domain.md): domain doc consumer rules + layout
 
 For "other" issue trackers, write `.claude/docs/agents/issue-tracker.md` from scratch using the user's description.
 
 ### 5. Done
 
-Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `.claude/docs/agents/*.md` directly later — re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
+Tell the user the setup is complete and which engineering skills will now read from these files. Mention they can edit `.claude/docs/agents/*.md` directly later; re-running this skill is only necessary if they want to switch issue trackers or restart from scratch.
